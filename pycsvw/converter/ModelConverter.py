@@ -1,0 +1,295 @@
+from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
+from pycsvw.utils.CSVUtils import CSVUtils
+from pycsvw.utils.DOPUtils import DOPUtils
+from pycsvw.utils.DialectUtils import DialectUtils
+from pycsvw.utils.MetadataLocator import MetadataLocator
+from pycsvw.utils.NumericUtils import NumericUtils
+from pycsvw.utils.TypeConverter import TypeConverter
+from pycsvw.utils.json.CommonProperties import CommonProperties
+from pycsvw.utils.json.JSONLDUtils import JSONLDUtils
+from pycsvw.utils.url.UriTemplateUtils import UriTemplateUtils
+
+
+class ModelConverter:
+
+    def __init__(self, csv_url=None, metadata_url=None):
+        super().__init__()
+        self.csv_url = csv_url
+        self.csvs = None
+        self.metadata_url = metadata_url
+        self.metadata = None
+        self.atdm = {'@type': '@AnnotatedTableGroup'}
+        self.mode = CONST_STANDARD_MODE
+
+    def convert_to_atdm(self, mode=CONST_STANDARD_MODE):
+        """ atdm - annotated tabular data model """
+        self.mode = mode
+        self.metadata = MetadataLocator.find_and_get(self.csv_url, self.metadata_url)
+        self._normalize_metadata_base_url()
+        self._fetch_csvs()
+        self._normalize_existing_metadata()
+        self._normalize_csv_values()
+
+        tables = []
+        self._add_table_metadata(self.metadata, self.atdm)
+        for index, table_metadata in enumerate(self.metadata['tables']):
+            rows = []
+            start_position = self._first_row_of_data(table_metadata)
+            for number, row_data in enumerate(self.csvs[index][start_position:], start=1):
+                source_number = number + start_position
+                rows.append(self._parse_row(row_data, number, source_number, table_metadata))
+            tables.append({'@type': 'AnnotatedTable', 'columns': table_metadata['tableSchema']['columns'], 'rows': rows,
+                           'url': table_metadata['url']})
+            self._add_table_metadata(table_metadata, tables[-1])
+            tables[-1] = {**table_metadata['tableSchema'], **tables[-1]}
+
+        for table in tables:
+            for column in table['columns']:
+                column['@type'] = 'Column'
+
+        self.atdm['tables'] = tables
+        self._normalize_atdm_values()
+        return self.atdm, self.metadata
+
+    @staticmethod
+    def _add_table_metadata(table_metadata, table):
+        for key, value in table_metadata.items():
+            if CommonProperties.is_common_property(key) or key == 'notes' or key == '@id':
+                table[key] = value
+
+    def _normalize_metadata_base_url(self):
+        if self.metadata is None:
+            return
+        for context_entry in self.metadata['@context']:
+            if type(context_entry) is dict and '@base' in context_entry:
+                original_url = self.metadata['url']
+                if original_url.startswith('http'):
+                    directory, file_name = original_url.rsplit('/', 1)
+                    self.metadata['url'] = directory + '/' + context_entry['@base'] + file_name
+                else:
+                    self.metadata['url'] = context_entry['@base'] + self.metadata['url']
+
+    def _fetch_csvs(self):
+        if self.metadata is None:
+            self.csvs = [CSVUtils.parse_csv_from_url_to_list(self.csv_url)]
+        else:
+            if 'tables' in self.metadata:
+                self.csvs = list(map(lambda table: CSVUtils.parse_csv_from_url_to_list(table['url']),
+                                     self.metadata['tables']))
+            else:
+                self.csvs = [CSVUtils.parse_csv_from_url_to_list(self.metadata['url'])]
+
+    def _normalize_existing_metadata(self):
+        if self.metadata is None:
+            self.metadata = {'@context': 'http://www.w3.org/ns/csvw', 'url': self.csv_url}
+            self._create_embedded_metadata()
+        if self.mode == CONST_MINIMAL_MODE:
+            self._convert_metadata_to_minimal_mode()
+
+        self._normalize_tables()
+        self._normalize_dialect()
+        self._add_table_schemas_if_necessary()
+        self._normalize_inherited_properties()
+        self._normalize_schemas()
+        self._normalize_columns()
+
+    def _create_embedded_metadata(self):
+        table = {'tableSchema': {'columns': []}, 'dialect': DialectUtils.get_default(), 'url': self.csv_url}
+        for cell in self.csvs[0][0]:
+            table['tableSchema']['columns'].append({'name': cell})
+        self.metadata = {'@context': 'http://www.w3.org/ns/csvw', 'tables': [table]}
+
+    def _convert_metadata_to_minimal_mode(self):
+        for key in list(self.metadata.keys()):
+            if ':' in key:
+                del self.metadata[key]
+
+    _omitted_properties = ['@context', 'tables', 'notes']
+
+    def _normalize_tables(self):
+        if 'tables' not in self.metadata:
+            table = {}
+            self.metadata['tables'] = [table]
+            for key in list(self.metadata.keys()):
+                if key not in self._omitted_properties and not CommonProperties.is_common_property(key):
+                    table[key] = self.metadata[key]
+                    del self.metadata[key]
+            self._add_common_properties_to_table(table)
+
+    def _normalize_dialect(self):
+        for table in self.metadata['tables']:
+            dialect = DialectUtils.get_default()
+            dialect = {**dialect, **self.metadata.get('dialect', {})}
+            dialect = {**dialect, **table.get('dialect', {})}
+            table['dialect'] = dialect
+        self.metadata.pop('dialect', None)
+
+    _inherited_properties = ['aboutUrl', 'datatype', 'default', 'lang', 'null', 'ordered', 'propertyUrl', 'required',
+                             'separator', 'textDirection', 'valueUrl']
+
+    _uri_template_properties = ['aboutUrl', 'propertyUrl', 'valueUrl']
+
+    def _normalize_inherited_properties(self):
+        for prop in self._inherited_properties:
+            self._normalize_inherited_property(prop)
+
+    def _normalize_inherited_property(self, property_name):
+        for table in self.metadata['tables']:
+            property_value = self.metadata.get(property_name, None)
+            property_value = table.get(property_name, property_value)
+            property_value = table['tableSchema'].get(property_name, property_value)
+
+            if property_value is not None:
+                for column in table['tableSchema']['columns']:
+                    if property_name not in column:
+                        column[property_name] = property_value
+                    if property_name in self._uri_template_properties:
+                        column[property_name] = UriTemplateUtils.expand(column[property_name], table['url'])
+
+    def _normalize_schemas(self):
+        for table in self.metadata['tables']:
+            if 'rowTitles' in table['tableSchema']:
+                row_titles = table['tableSchema']['rowTitles']
+                if type(row_titles) is str:
+                    table['tableSchema']['rowTitles'] = [row_titles]
+
+    def _normalize_columns(self):
+        self._normalize_column_names()
+        self._normalize_datatypes()
+
+    def _normalize_column_names(self):
+        """ Adds 'name' property if not present """
+        for table in self.metadata['tables']:
+            for i, column in enumerate(table['tableSchema']['columns'], start=1):
+                if 'name' not in column:
+                    language = JSONLDUtils.language(self.metadata['@context'], table)
+                    titles = column['titles'] if type(column['titles']) is list else [column['titles']]
+                    if language is None:
+                        column['name'] = DOPUtils.natural_language_first_value(titles)
+                    else:
+                        for title in titles:
+                            if type(title) is str:
+                                column['name'] = title
+                                break
+                            if type(title) is dict:
+                                (lang, value), = title.items()
+                                if lang == language:
+                                    column['name'] = value
+                                    break
+                        if 'name' not in column:
+                            column['name'] = '_col.' + str(i)
+
+    def _normalize_datatypes(self):
+        for table in self.metadata['tables']:
+            for column in table['tableSchema']['columns']:
+                if 'datatype' in column:
+                    datatype = column['datatype']
+                    if type(datatype) is dict and 'base' not in datatype:
+                        datatype['base'] = 'string'
+
+    def _add_common_properties_to_table(self, table):
+        """ Moves common properties from group of tables to table """
+        for key, value in list(self.metadata.items()):
+            if CommonProperties.is_common_property(key) or key == 'notes' or key == '@id':
+                table[key] = value
+                del self.metadata[key]
+
+    def _add_table_schemas_if_necessary(self):
+        for index, table in enumerate(self.metadata['tables']):
+            if 'tableSchema' not in table:
+                self.add_table_schema(table, index)
+
+    def add_table_schema(self, table, index):
+        if self._has_header_row(table['dialect']):
+            columns = list(map(lambda col_name: {'name': col_name}, self.csvs[index][0]))
+        else:
+            columns = list(map(lambda index: {'name': '_col.' + str(index + 1)}, range(len(self.csvs[index][0]))))
+        table['tableSchema'] = {}
+        table['tableSchema']['columns'] = columns
+
+    @staticmethod
+    def _has_header_row(dialect):
+        return dialect['header']
+
+    @staticmethod
+    def _columns(table):
+        return list(map(lambda json: json['name'], table['tableSchema']['columns']))
+
+    def _normalize_csv_values(self):
+        self._set_default_values()
+        self._normalize_numbers_notation()
+        self._normalize_exponent_signs()
+
+    def _set_default_values(self):
+        for table_metadata, csv in zip(self.metadata['tables'], self.csvs):
+            for i, column_metadata in enumerate(table_metadata['tableSchema']['columns']):
+                if 'default' in column_metadata:
+                    for row in csv:
+                        if row[i] == '':
+                            row[i] = column_metadata['default']
+
+    def _normalize_numbers_notation(self):
+        """ Deletes group char and replaces decimal char with '.' in decimal cells """
+        for table_metadata, csv in zip(self.metadata['tables'], self.csvs):
+            for i, column_metadata in enumerate(table_metadata['tableSchema']['columns']):
+                if type(column_metadata.get('datatype')) is dict and 'format' in column_metadata['datatype']:
+                    cell_format = column_metadata['datatype']['format']
+                    if type(cell_format) is dict:
+                        group_char = cell_format.get('groupChar')
+                        decimal_char = cell_format.get('decimalChar')
+                        if group_char is not None:
+                            for row in csv:
+                                row[i] = row[i].replace(group_char, '')
+                        if decimal_char is not None:
+                            for row in csv:
+                                row[i] = row[i].replace(decimal_char, '.')
+                        for row in csv:
+                            row[i] = row[i].replace(',', '')
+
+    def _normalize_exponent_signs(self):
+        for table_metadata, csv in zip(self.metadata['tables'], self.csvs):
+            for i, column_metadata in enumerate(table_metadata['tableSchema']['columns']):
+                if 'datatype' in column_metadata:
+                    datatype = TypeConverter.get_type_name(column_metadata['datatype'])
+                    if datatype == 'decimal':
+                        for row in csv:
+                            row[i] = row[i][:-1] if row[i][-1] == 'E' else row[i]
+                            row[i] = NumericUtils.interpret_special_signs(row[i])
+
+    def _parse_row(self, row, number, source_number, table_metadata):
+        json_row = {'@id': table_metadata['url'] + '#row=' + str(source_number),
+                    'number': number, 'sourceNumber': source_number,
+                    'cells': self._row_data_to_json(row, table_metadata)}
+        return json_row
+
+    def _row_data_to_json(self, row, metadata):
+        cells_map = {}
+        for column_metadata, column_data in zip(metadata['tableSchema']['columns'], row):
+            column_name = column_metadata['name']
+            if column_data.startswith('\"'):
+                column_data = column_data[1:-1]
+            if 'separator' in column_metadata:
+                column_data = column_data.split(column_metadata['separator'])
+                column_data = list(map(lambda item: item.strip(), column_data))
+            else:
+                column_data = [column_data]
+
+            cells_map[column_name] = column_data
+        return cells_map
+
+    @staticmethod
+    def _first_row_of_data(metadata):
+        rows_to_skip_count = metadata['dialect']['skipRows']
+        header_row_count = metadata['dialect']['headerRowCount']
+        return rows_to_skip_count + header_row_count
+
+    def _normalize_atdm_values(self):
+        for table_metadata, atdm_table in zip(self.metadata['tables'], self.atdm['tables']):
+            dialect = table_metadata['dialect']
+            columns = table_metadata['tableSchema']['columns']
+            for i in range(dialect['skipColumns'], len(columns)):
+                if 'datatype' in columns[i]:
+                    column_name = columns[i]['name']
+                    for row in atdm_table['rows']:
+                        row['cells'][column_name] = list(map(lambda value: TypeConverter.convert_if_necessary(
+                            value, columns[i]), row['cells'][column_name]))
