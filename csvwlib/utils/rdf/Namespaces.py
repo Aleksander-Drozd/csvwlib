@@ -1,7 +1,7 @@
 from rdflib import URIRef
 from rdflib.namespace import Namespace
 
-from pycsvw.utils.rdf import CSVW
+from csvwlib.utils.rdf import CSVW
 
 
 class Namespaces:

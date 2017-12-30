@@ -4,15 +4,15 @@ from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import XSD
 
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE
-from pycsvw.utils.json.CommonProperties import CommonProperties
-from pycsvw.utils.json.JSONLDUtils import JSONLDUtils
-from pycsvw.utils.rdf.Namespaces import Namespaces
-from pycsvw.utils.rdf.OntologyUtils import OntologyUtils
-from pycsvw.utils.rdf.RDFGraphUtils import RDFGraphUtils
-from pycsvw.utils.url.PropertyUrlUtils import PropertyUrlUtils
-from pycsvw.utils.url.UriTemplateUtils import UriTemplateUtils
-from pycsvw.utils.url.ValueUrlUtils import ValueUrlUtils
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE
+from csvwlib.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.json.JSONLDUtils import JSONLDUtils
+from csvwlib.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.rdf.OntologyUtils import OntologyUtils
+from csvwlib.utils.rdf.RDFGraphUtils import RDFGraphUtils
+from csvwlib.utils.url.PropertyUrlUtils import PropertyUrlUtils
+from csvwlib.utils.url.UriTemplateUtils import UriTemplateUtils
+from csvwlib.utils.url.ValueUrlUtils import ValueUrlUtils
 
 CSVW = Namespace('http://www.w3.org/ns/csvw#')
 

@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import requests
 
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
-from pycsvw.converter.CSVWConverter import CSVWConverter
-from pycsvw.utils.MetadataLocator import MetadataLocator
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
+from csvwlib.converter.CSVWConverter import CSVWConverter
+from csvwlib.utils.MetadataLocator import MetadataLocator
 
 
 class TestToJSONConverter(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestToJSONConverter(unittest.TestCase):
         metadata = MetadataLocator.find_and_get(csv_url, metadata_url)
         csv_url_sufix = csv_url.rsplit('/', 1)[0] + '/' if csv_url is not None else self._tests_location
         self._prepare_metadata_for_test(csv_url, metadata_url, csv_url_sufix, metadata)
-        with patch('pycsvw.converter.ModelConverter.MetadataLocator.find_and_get') as _mock:
+        with patch('csvwlib.converter.ModelConverter.MetadataLocator.find_and_get') as _mock:
             _mock.return_value = metadata
             converted = CSVWConverter.to_json(csv_url, metadata_url, mode)
         expected = jsonlib.loads(requests.get(result_url).content)
@@ -100,7 +100,7 @@ class TestToJSONConverter(unittest.TestCase):
     def test013(self):
         self.run_test('tree-ops.csv', 'test013.json', metadata_url='test013-user-metadata.json')
 
-    @mock.patch('pycsvw.utils.MetadataLocator.requests.head')
+    @mock.patch('csvwlib.utils.MetadataLocator.requests.head')
     def test014(self, head_mock):
         head_mock.return_value.headers = {'Link': ''}
         head_mock.return_value.links = {'describedby': {'url': 'linked-metadata.json'}}
@@ -109,7 +109,7 @@ class TestToJSONConverter(unittest.TestCase):
     def test015(self):
         self.run_test('test015/tree-ops.csv', 'test015/result.json', 'test015/user-metadata.json')
 
-    @mock.patch('pycsvw.utils.MetadataLocator.requests.head')
+    @mock.patch('csvwlib.utils.MetadataLocator.requests.head')
     def test016(self, head_mock):
         head_mock.return_value.headers = {'Link': ''}
         head_mock.return_value.links = {'describedby': {'url': 'linked-metadata.json'}}

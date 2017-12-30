@@ -1,7 +1,7 @@
 from rdflib import Literal, URIRef, BNode, RDF
 
-from pycsvw.utils.rdf.Namespaces import Namespaces
-from pycsvw.utils.rdf.RDFUtils import RDFUtils
+from csvwlib.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.rdf.RDFUtils import RDFUtils
 
 
 class CommonProperties:

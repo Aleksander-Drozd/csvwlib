@@ -1,7 +1,7 @@
 from rdflib import URIRef
 
-from pycsvw.utils.json.CommonProperties import CommonProperties
-from pycsvw.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.rdf.Namespaces import Namespaces
 
 
 class ValueUrlUtils:

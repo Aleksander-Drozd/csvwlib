@@ -4,7 +4,7 @@ import unittest
 
 from pipenv.utils import requests
 
-from pycsvw.converter.ModelConverter import convert_from_url
+from csvwlib.converter.ModelConverter import convert_from_url
 
 
 class TestModelConverter(unittest.TestCase):

@@ -6,8 +6,8 @@ from utils.MetadataLocator import MetadataLocator
 from utils.PropertyUtils import is_common_property, is_array_property, is_link_property, is_object_property, \
     is_natural_language_property, is_atomic_property
 
-from pycsvw.utils.json import CommonProperties
-from pycsvw.utils.json import JSONLDUtils
+from csvwpy.utils.json import CommonProperties
+from csvwpy.utils.json import JSONLDUtils
 
 
 class ModelConverter2:

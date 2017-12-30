@@ -1,7 +1,7 @@
 from rdflib import URIRef, Literal
 
-from pycsvw.utils.ATDMUtils import ATDMUtils
-from pycsvw.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.ATDMUtils import ATDMUtils
+from csvwlib.utils.json.CommonProperties import CommonProperties
 
 
 class UriTemplateUtils:

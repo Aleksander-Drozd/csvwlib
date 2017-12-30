@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from pycsvw.converter.ModelConverter2 import ModelConverter2
+from csvwlib.converter.ModelConverter2 import ModelConverter2
 
 
 class TestModelConverter(unittest.TestCase):

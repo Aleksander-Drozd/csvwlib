@@ -1,6 +1,6 @@
-from pycsvw.converter.ModelConverter import ModelConverter
-from pycsvw.converter.ToJSONConverter import ToJSONConverter
-from pycsvw.converter.ToRDFConverter import ToRDFConverter
+from csvwlib.converter.ModelConverter import ModelConverter
+from csvwlib.converter.ToJSONConverter import ToJSONConverter
+from csvwlib.converter.ToRDFConverter import ToRDFConverter
 
 
 class CSVWConverter:

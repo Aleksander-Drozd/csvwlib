@@ -2,7 +2,7 @@ import json as jsonlib
 
 import requests
 
-from pycsvw.utils.url.WellKnownUriResolver import WellKnownUriResolver
+from csvwlib.utils.url.WellKnownUriResolver import WellKnownUriResolver
 
 
 class MetadataLocator:

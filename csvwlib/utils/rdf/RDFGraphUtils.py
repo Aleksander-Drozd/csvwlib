@@ -1,8 +1,8 @@
 from rdflib import Namespace
 
-from pycsvw.utils.json.CommonProperties import CommonProperties
-from pycsvw.utils.rdf.Namespaces import Namespaces
-from pycsvw.utils.url.PropertyUrlUtils import PropertyUrlUtils
+from csvwlib.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.url.PropertyUrlUtils import PropertyUrlUtils
 
 
 class RDFGraphUtils:

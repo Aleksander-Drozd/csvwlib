@@ -1,12 +1,12 @@
 ## About
 
-`pycsvw` is a python implementation of [W3C CSV on the Web recommendations](http://w3c.github.io/csvw/).
+`csvwlib` is a python implementation of [W3C CSV on the Web recommendations](http://w3c.github.io/csvw/).
 It enables merging CSV file and associated metadata into JSON or RDF.
 
 ## Installation
 
 ```
-pip install pycsvw
+pip install csvwlib
 ```
 
 ## Usage
@@ -22,10 +22,13 @@ The are 3 ways of starting conversion process.
 * pass both `csv_url` and `metadata_url` - metadata by user will be used. If `url` field is set in metadata, the CSV file will be retrieved from that location which can cause, that passed `csv_url` will be ignored
 * pass only `metadata_url` - associated CSV files will be retrieved based on metadata `url` field  
 
-You can also specify the conversion mode - `standard` or `minimal`, the default is `standard`  
+You can also specify the conversion mode - `standard` or `minimal`, the default is `standard`.
+From [documentation](https://www.w3.org/TR/2015/REC-csv2rdf-20151217/)
+> **Standard** mode conversion frames the information gleaned from the cells of the tabular data with details of the rows, tables, and a group of tables within which that information is provided.  
+**Minimal** mode conversion includes only the information gleaned from the cells of the tabular data.
 
 After conversion to JSON, you receive a `dict` object, when converting to RDF it is more complex.
-If you pass `format` parameter, graph will be serialized to this format. 
+If you pass `format` parameter, graph will be serialized to this format and returned as string. 
 From `rdflib` docs
 > Format support can be extended with plugins, but 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'trix', 'trig' and 'nquads' are built in.
 
@@ -35,7 +38,7 @@ If you don't specify the format, you will receive a `rdflib.Graph` object.
 Example files can be found at [http://w3c.github.io/csvw/tests/](http://w3c.github.io/csvw/tests/)  
 Common import for all examples:
 ```python
-from pycsvw import CSVWConverter
+from csvwlib import CSVWConverter
 ```
 
 Start with csv

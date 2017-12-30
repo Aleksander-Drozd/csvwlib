@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from pycsvw.converter.CSVWConverter import CSVWConverter
+from csvwlib.converter.CSVWConverter import CSVWConverter
 from rdflib import Graph
 from rdflib.compare import to_isomorphic, graph_diff
-from pycsvw.utils.MetadataLocator import MetadataLocator
+from csvwlib.utils.MetadataLocator import MetadataLocator
 
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE
 
 
 class TestModelConverter(unittest.TestCase):

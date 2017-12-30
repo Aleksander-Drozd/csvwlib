@@ -1,13 +1,13 @@
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
-from pycsvw.utils.CSVUtils import CSVUtils
-from pycsvw.utils.DOPUtils import DOPUtils
-from pycsvw.utils.DialectUtils import DialectUtils
-from pycsvw.utils.MetadataLocator import MetadataLocator
-from pycsvw.utils.NumericUtils import NumericUtils
-from pycsvw.utils.TypeConverter import TypeConverter
-from pycsvw.utils.json.CommonProperties import CommonProperties
-from pycsvw.utils.json.JSONLDUtils import JSONLDUtils
-from pycsvw.utils.url.UriTemplateUtils import UriTemplateUtils
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
+from csvwlib.utils.CSVUtils import CSVUtils
+from csvwlib.utils.DOPUtils import DOPUtils
+from csvwlib.utils.DialectUtils import DialectUtils
+from csvwlib.utils.MetadataLocator import MetadataLocator
+from csvwlib.utils.NumericUtils import NumericUtils
+from csvwlib.utils.TypeConverter import TypeConverter
+from csvwlib.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.json.JSONLDUtils import JSONLDUtils
+from csvwlib.utils.url.UriTemplateUtils import UriTemplateUtils
 
 
 class ModelConverter:

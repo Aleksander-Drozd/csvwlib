@@ -1,7 +1,7 @@
 from rdflib import Namespace
 
-from pycsvw.utils.rdf.Namespaces import Namespaces
-from pycsvw.utils.url.UriTemplateUtils import UriTemplateUtils
+from csvwlib.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.url.UriTemplateUtils import UriTemplateUtils
 
 
 class PropertyUrlUtils:

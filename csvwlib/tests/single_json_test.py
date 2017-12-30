@@ -3,11 +3,11 @@ import unittest
 from unittest.mock import patch
 
 import requests
-from pycsvw.converter.CSVWConverter import CSVWConverter
+from csvwlib.converter.CSVWConverter import CSVWConverter
 from deepdiff import DeepDiff
-from pycsvw.utils.MetadataLocator import MetadataLocator
+from csvwlib.utils.MetadataLocator import MetadataLocator
 
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE
 
 
 class TestToJSONConverter(unittest.TestCase):

@@ -1,4 +1,4 @@
-from pycsvw.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.rdf.Namespaces import Namespaces
 
 
 class RDFUtils:

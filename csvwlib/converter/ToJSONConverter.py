@@ -1,11 +1,11 @@
 from rdflib import Namespace
 
-from pycsvw.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
-from pycsvw.utils.json.CommonProperties import CommonProperties
-from pycsvw.utils.json.JSONLDUtils import JSONLDUtils
-from pycsvw.utils.rdf.CSVW import is_non_core_annotation
-from pycsvw.utils.rdf.Namespaces import Namespaces
-from pycsvw.utils.url.UriTemplateUtils import UriTemplateUtils
+from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE, CONST_MINIMAL_MODE
+from csvwlib.utils.json.CommonProperties import CommonProperties
+from csvwlib.utils.json.JSONLDUtils import JSONLDUtils
+from csvwlib.utils.rdf.CSVW import is_non_core_annotation
+from csvwlib.utils.rdf.Namespaces import Namespaces
+from csvwlib.utils.url.UriTemplateUtils import UriTemplateUtils
 
 CSVW = Namespace('http://www.w3.org/ns/csvw#')
 
