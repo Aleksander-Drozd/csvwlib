@@ -7,6 +7,7 @@ from csvwlib.utils.NumericUtils import NumericUtils
 from csvwlib.utils.TypeConverter import TypeConverter
 from csvwlib.utils.json.CommonProperties import CommonProperties
 from csvwlib.utils.json.JSONLDUtils import JSONLDUtils
+from csvwlib.utils.url.PropertyUrlUtils import PropertyUrlUtils
 from csvwlib.utils.url.UriTemplateUtils import UriTemplateUtils
 
 
@@ -26,6 +27,7 @@ class ModelConverter:
         self.mode = mode
         self.metadata = MetadataLocator.find_and_get(self.csv_url, self.metadata_url)
         self._normalize_metadata_base_url()
+        self._normalize_metadata_csv_url()
         self._fetch_csvs()
         self._normalize_existing_metadata()
         self._normalize_csv_values()
@@ -68,6 +70,21 @@ class ModelConverter:
                     self.metadata['url'] = directory + '/' + context_entry['@base'] + file_name
                 else:
                     self.metadata['url'] = context_entry['@base'] + self.metadata['url']
+
+    def _normalize_metadata_csv_url(self):
+        """ Expands 'url' properties if necessary """
+        if self.metadata is None:
+            return
+        domain = PropertyUrlUtils.domain(self.metadata_url) if self.metadata_url is not None else \
+            PropertyUrlUtils.domain(self.csv_url)
+        if 'url' in self.metadata:
+            if not self.metadata['url'].startswith('http'):
+                self.metadata['url'] = domain + self.metadata['url']
+        else:
+            for table in self.metadata.get('tables', []):
+                if 'url' in table:
+                    if not table['url'].startswith('http'):
+                        table['url'] = domain + table['url']
 
     def _fetch_csvs(self):
         if self.metadata is None:
