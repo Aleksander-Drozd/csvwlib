@@ -8,7 +8,7 @@ class PropertyUrlUtils:
 
     @staticmethod
     def domain(property_url):
-        return property_url[:property_url.find('{')]
+        return property_url.rsplit('/', 1)[0] + '/'
 
     @staticmethod
     def ontology_prefix(property_url):

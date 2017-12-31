@@ -91,10 +91,18 @@ class ModelConverter:
             self.csvs = [CSVUtils.parse_csv_from_url_to_list(self.csv_url)]
         else:
             if 'tables' in self.metadata:
-                self.csvs = list(map(lambda table: CSVUtils.parse_csv_from_url_to_list(table['url']),
+                self.csvs = list(map(lambda table:
+                                     CSVUtils.parse_csv_from_url_to_list(table['url'], self._delimiter(table)),
                                      self.metadata['tables']))
             else:
-                self.csvs = [CSVUtils.parse_csv_from_url_to_list(self.metadata['url'])]
+                self.csvs = [CSVUtils.parse_csv_from_url_to_list(self.metadata['url'], self._delimiter(self.metadata))]
+
+    @staticmethod
+    def _delimiter(metadata):
+        delimiter = ','
+        if 'dialect' in metadata:
+            delimiter = metadata['dialect'].get('delimiter', delimiter)
+        return metadata.get('delimiter', delimiter)
 
     def _normalize_existing_metadata(self):
         if self.metadata is None:
