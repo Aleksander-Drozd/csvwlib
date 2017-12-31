@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='csvwlib',
-      version='0.2',
+      version='0.2.1',
       description='Python implementation of CSV on the Web',
       long_description=readme(),
       url='https://github.com/Aleksander-Drozd/csvwlib',
@@ -15,7 +15,7 @@ setup(name='csvwlib',
       author='Aleksander Drozd',
       author_email='aleksander.drozd@outlook.com',
       license='MIT',
-	  packages=['csvwlib'],
+	  packages=['csvwlib', 'csvwlib.converter', 'csvwlib.utils', 'csvwlib.utils.rdf', 'csvwlib.utils.url', 'csvwlib.utils.json'],
       install_requires=[
           'python-dateutil==2.6.1',
           'rdflib==4.2.2',
