@@ -41,6 +41,8 @@ class MetadataLocator:
 
         lines = response.content.decode().splitlines()
         for relative_uri_template in lines:
+            if relative_uri_template == '':
+                continue
             metadata_url = WellKnownUriResolver.resolve(relative_uri_template, csv_url)
             response = requests.get(metadata_url)
             if response.status_code != 404:

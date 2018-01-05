@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='csvwlib',
-      version='0.2.1',
+      version='0.2.2',
       description='Python implementation of CSV on the Web',
       long_description=readme(),
       url='https://github.com/Aleksander-Drozd/csvwlib',
