@@ -1,7 +1,7 @@
 import unittest
 
 from csvwlib.converter.CSVWConverter import CSVWConverter
-from rdflib import Graph
+from rdflib import Graph, URIRef
 from rdflib.compare import to_isomorphic, graph_diff
 
 from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE
@@ -34,11 +34,24 @@ class TestModelConverter(unittest.TestCase):
         expected.parse(result_graph_url)
         print(expected.serialize(format='ttl').decode())
         print(converted.serialize(format='ttl').decode())
-        try:
-            self.assertEqual(to_isomorphic(converted), to_isomorphic(expected))
-        except AssertionError:
-            self.diff(to_isomorphic(converted), to_isomorphic(expected))
-            raise AssertionError
+        self.change_urls_in_result(expected)
+        self.diff(to_isomorphic(converted), to_isomorphic(expected))
+        self.assertEqual(to_isomorphic(converted), to_isomorphic(expected))
+
+    def change_urls_in_result(self, graph):
+        for s, p, o in graph.triples((None, None, None)):
+            if self._remote_tests_location in s:
+                graph.remove((s, p, o))
+                s = URIRef(s.replace(self._remote_tests_location, self._tests_location))
+                graph.add((s, p, o))
+            if self._remote_tests_location in p:
+                graph.remove((s, p, o))
+                p = URIRef(p.replace(self._remote_tests_location, self._tests_location))
+                graph.add((s, p, o))
+            if self._remote_tests_location in o:
+                graph.remove((s, p, o))
+                o = URIRef(o.replace(self._remote_tests_location, self._tests_location))
+                graph.add((s, p, o))
 
     def test001(self):
         self.run_test('test011/tree-ops.csv', 'test011/result.ttl')

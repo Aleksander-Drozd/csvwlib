@@ -196,3 +196,42 @@ def is_non_core_annotation(name):
 
 CONST_STANDARD_MODE = 'standard'
 CONST_MINIMAL_MODE = 'minimal'
+
+core_group_of_tables_properties = ['tables', 'dialect', 'notes', 'tableDirection', 'tableSchema', 'transformations',
+                                   '@id', '@type', '@context']
+
+core_table_properties = ['url', 'dialect', 'notes', 'suppressOutput', 'tableDirection', 'tableSchema',
+                         'transformations', '@id', '@type']
+
+inherited_properties = ['aboutUrl', 'datatype', 'default', 'lang', 'null', 'ordered', 'propertyUrl', 'required',
+                        'separator', 'textDirection', 'valueUrl']
+
+array_properties = ['tables', 'transformations', '@context', 'notes', 'foreignKeys',
+                    'columns', 'lineTerminators']
+
+array_property_item_types = {
+    'columns': dict,
+    'foreignKeys': dict,
+    'lineTerminators': str,
+    'notes': dict,
+    'transformations': dict,
+    'tables': dict,
+}
+
+number_datatypes = ['decimal', 'integer', 'integer', 'long', 'int', 'short', 'byte', 'nonNegativeInteger',
+                    'positiveInteger', 'unsignedLong', 'unsignedInt', 'unsignedShort', 'unsignedByte',
+                    'nonPositiveInteger', 'negativeInteger', 'double', 'number', 'duration', 'dayTimeDuration',
+                    'yearMonthDuration', 'float']
+
+date_datatypes = ['date', 'dateTime', 'datetime', 'dateTimeStamp']
+
+fields_properties = {
+    'transformations': {'url': True, 'scriptFormat': True, 'targetFormat': True, 'source': False, 'titles': False,
+                        '@id': False, '@type': True},
+    'tableGroup': {'tables': True, 'dialect': False, 'notes': False, 'tableDirection': False, 'tableSchema': False,
+                   'transformations': False, '@id': False, '@type': False, '@context': True},
+    'tables': {'url': True, 'dialect': False, 'notes': False, 'suppressOutput': False, 'tableDirection': False,
+               'transformations': False, 'tableSchema': False, '@id': False, '@type': False},
+    'columns': {'name': False, 'suppressOutput': False, 'titles': False, 'virtual': False, '@id': False,
+                '@type': False, }
+}

@@ -8,7 +8,10 @@ class TypeConverter:
         if 'datatype' not in column_metadata:
             return value
 
-        datatype = column_metadata['datatype']
+        return TypeConverter.convert(value, column_metadata['datatype'])
+
+    @staticmethod
+    def convert(value, datatype):
         type_name = TypeConverter.get_type_name(datatype)
         return {
             'boolean': lambda: TypeConverter._convert_boolean(value, datatype),
@@ -27,7 +30,7 @@ class TypeConverter:
     @staticmethod
     def get_type_name(datatype_entry):
         if type(datatype_entry) is dict:
-            return datatype_entry['base']
+            return datatype_entry.get('base', 'string')
         else:
             return datatype_entry
 
@@ -91,7 +94,17 @@ class TypeConverter:
             if string.isdigit():
                 return bool(int(string))
             else:
-                return True if string == 'true' else False
+                if string == 'true':
+                    return True
+                elif string == 'false':
+                    return False
+                else:
+                    return string
 
         true_template, false_template = datatype_metadata['format'].split('|')
-        return True if string == true_template else False
+        if string == true_template:
+            return True
+        elif string == false_template:
+            return False
+        else:
+            return string

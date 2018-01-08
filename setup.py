@@ -7,11 +7,11 @@ def readme():
 
 
 setup(name='csvwlib',
-      version='0.2.2',
+      version='0.3.1',
       description='Python implementation of CSV on the Web',
       long_description=readme(),
       url='https://github.com/Aleksander-Drozd/csvwlib',
-      download_url='https://github.com/Aleksander-Drozd/csvwlib/archive/0.1.tar.gz',
+      download_url='https://github.com/Aleksander-Drozd/csvwlib/archive/0.3.tar.gz',
       author='Aleksander Drozd',
       author_email='aleksander.drozd@outlook.com',
       license='MIT',
@@ -22,5 +22,6 @@ setup(name='csvwlib',
           'rdflib-jsonld==0.4.0',
           'requests==2.18.4',
           'uritemplate==3.0.0',
+		  'language-tags==0.4.3'
       ],
       zip_safe=False)

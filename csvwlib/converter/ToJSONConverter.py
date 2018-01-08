@@ -51,19 +51,27 @@ class ToJSONConverter:
         subjects = {'': described_row}
         self._supply_subjects(atdm_table, atdm_row, subjects)
 
-        for cell, column_metadata in zip(atdm_row['cells'].items(), atdm_table['columns']):
+        for cell in atdm_row['cells'].items():
             col_name, values = cell
+            for column_metadata in atdm_table['columns']:
+                if column_metadata['name'] == col_name:
+                    break
             about_url = ''
             if 'aboutUrl' in column_metadata:
                 about_url = UriTemplateUtils.insert_value(column_metadata['aboutUrl'], atdm_row, col_name,
                                                           atdm_table['url'])
             subject = subjects[about_url]
-            if (len(values) == 1 and values[0]) == '' or column_metadata.get('suppressOutput', False):
+            if column_metadata.get('suppressOutput', False):
                 continue
             value = self._value(col_name, values, atdm_row, atdm_table, column_metadata)
             prop = self._property(col_name, atdm_row, atdm_table, column_metadata)
             if prop in subject:
-                subject[prop].extend(value)
+                if type(subject[prop]) is str:
+                    subject[prop] = [subject[prop]]
+                if type(value) is str:
+                    subject[prop].append(value)
+                else:
+                    subject[prop].extend(value)
             else:
                 subject[prop] = value
 

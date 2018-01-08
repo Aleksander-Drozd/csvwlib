@@ -4,6 +4,7 @@ from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
 from rdflib.collection import Collection
 from rdflib.namespace import XSD
 
+from csvwlib.utils import datatypeutils
 from csvwlib.utils.rdf.CSVW import CONST_STANDARD_MODE
 from csvwlib.utils.json.CommonProperties import CommonProperties
 from csvwlib.utils.json.JSONLDUtils import JSONLDUtils
@@ -56,11 +57,11 @@ class ToRDFConverter:
         for index, atdm_row in enumerate(table_data['rows']):
             if self.mode == CONST_STANDARD_MODE:
                 row_node = BNode()
-                self._parse_generic_row(atdm_row, table_node, table_metadata, property_url, row_node)
+                self._parse_generic_row(atdm_row, table_node, table_metadata, property_url, row_node, table_data)
             else:
                 dummy = BNode()
                 row_node = BNode()
-                self._parse_row(atdm_row, row_node, dummy, table_metadata, property_url)
+                self._parse_row(atdm_row, row_node, dummy, table_metadata, property_url, table_data)
                 self.graph.remove((dummy, CSVW.describes, row_node))
             self.parse_virtual_columns(row_node, atdm_row, table_metadata)
 
@@ -84,7 +85,7 @@ class ToRDFConverter:
                 triples = CommonProperties.property_to_triples((key, metadata[key]), node, language)
                 self.graph.addN(triple + (self.graph,) for triple in triples)
 
-    def _parse_generic_row(self, atdm_row, table_node, metadata, property_url, row_node):
+    def _parse_generic_row(self, atdm_row, table_node, metadata, property_url, row_node, atdm_table):
         self.graph.add((table_node, CSVW.row, row_node))
         self.graph.add((row_node, RDF.type, CSVW.Row))
         self.graph.add((row_node, CSVW.rownum, Literal(atdm_row['number'], datatype=XSD.integer)))
@@ -95,18 +96,21 @@ class ToRDFConverter:
                 col_value = atdm_row['cells'][col_name][0]
                 self.graph.add((row_node, CSVW.title, Literal(col_value)))
         values_node = BNode()
-        self._parse_row(atdm_row, values_node, row_node, metadata, property_url)
+        self._parse_row(atdm_row, values_node, row_node, metadata, property_url, atdm_table)
 
-    def _parse_row(self, atdm_row, values_node, row_node, metadata, property_url):
+    def _parse_row(self, atdm_row, values_node, row_node, metadata, property_url, atdm_Table):
         if not all(map(lambda column: 'aboutUrl' in column, metadata['tableSchema']['columns'])):
             self.graph.add((row_node, CSVW.describes, values_node))
-        self._parse_row_data(atdm_row, values_node, metadata, property_url, row_node)
+        self._parse_row_data(atdm_row, values_node, metadata, property_url, row_node, atdm_Table)
 
-    def _parse_row_data(self, atdm_row, subject, table_metadata, property_url, row_node):
+    def _parse_row_data(self, atdm_row, subject, table_metadata, property_url, row_node, atdm_table):
         top_level_property_url = property_url
+        atdm_columns = atdm_table['columns']
         for index, entry in enumerate(atdm_row['cells'].items()):
             col_name, values = entry
-            col_metadata = table_metadata['tableSchema']['columns'][index]
+            for col_metadata in atdm_columns:
+                if col_metadata['name'] == col_name:
+                    break
             if col_metadata.get('suppressOutput', False):
                 continue
             property_url = col_metadata.get('propertyUrl', top_level_property_url)
@@ -127,8 +131,6 @@ class ToRDFConverter:
             rdf_list = next_item
             values_count = len(values)
             for i in range(values_count):
-                if values[i] == '':
-                    continue
                 item = next_item
                 self.graph.add((item, RDF.first, Literal(values[i])))
                 if i != values_count - 1:
@@ -138,8 +140,6 @@ class ToRDFConverter:
             self.graph.add((subject, predicate, rdf_list))
         else:
             for value in values:
-                if value == '':
-                    continue
                 object_node = self._object_node(value, col_metadata)
                 self.graph.add((subject, predicate, object_node))
 
@@ -149,7 +149,11 @@ class ToRDFConverter:
             return ValueUrlUtils.create_uri_ref(value, col_metadata['valueUrl'])
         else:
             lang = col_metadata.get('lang')
-            datatype = OntologyUtils.type(col_metadata)
+            if not datatypeutils.is_compatible_with_datatype(value, col_metadata.get('datatype')):
+                datatype = None
+            else:
+                datatype = OntologyUtils.type(col_metadata)
+
             lang = None if datatype is not None else lang
             return Literal(value, lang=lang, datatype=datatype)
 

@@ -30,3 +30,15 @@ class NumericUtils:
             number = number[:-shift] + '.' + number[-shift:]
 
         return number
+
+    @staticmethod
+    def is_numeric(number):
+        if type(number) is not str:
+            return True
+        number = number.replace('.', '', 1)
+        number = number.replace('+', '', 1)
+        number = number.replace('-', '', 1)
+        number = number.replace('E', '', 1)
+        number = number.replace('%', '', 1)
+        number = number.replace('‰', '', 1)
+        return number.isnumeric()
