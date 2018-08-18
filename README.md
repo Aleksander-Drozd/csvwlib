@@ -3,6 +3,8 @@
 `csvwlib` is a python implementation of [W3C CSV on the Web recommendations](http://w3c.github.io/csvw/).
 It enables merging CSV file and associated metadata into JSON or RDF.
 
+**This library is not compatible with Python2**
+
 ## Installation
 
 ```
