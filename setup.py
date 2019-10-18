@@ -20,7 +20,7 @@ setup(name='csvwlib',
           'python-dateutil==2.6.1',
           'rdflib==4.2.2',
           'rdflib-jsonld==0.4.0',
-          'requests==2.18.4',
+          'requests==2.20.0',
           'uritemplate==3.0.0',
 		  'language-tags==0.4.3'
       ],
