@@ -1,3 +1,6 @@
+This package is no longer maintained. Feel free to fork and develop on your own
+-------------------------------------------------------------------------------
+
 About
 -----
 

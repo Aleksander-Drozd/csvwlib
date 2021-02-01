@@ -1,3 +1,5 @@
+#### This package is no longer maintained. Feel free to fork and develop on your own
+
 ## About
 
 `csvwlib` is a python implementation of [W3C CSV on the Web recommendations](http://w3c.github.io/csvw/).
