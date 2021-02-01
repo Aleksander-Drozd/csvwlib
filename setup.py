@@ -17,11 +17,11 @@ setup(name='csvwlib',
       license='MIT',
 	  packages=['csvwlib', 'csvwlib.converter', 'csvwlib.utils', 'csvwlib.utils.rdf', 'csvwlib.utils.url', 'csvwlib.utils.json'],
       install_requires=[
-          'python-dateutil==2.6.1',
-          'rdflib==4.2.2',
-          'rdflib-jsonld==0.4.0',
-          'requests==2.18.4',
-          'uritemplate==3.0.0',
-		  'language-tags==0.4.3'
+          'python-dateutil >= 2.6.1',
+          'rdflib >= 4.2.2',
+          'rdflib-jsonld >= 0.4.0',
+          'requests >= 2.18.4',
+          'uritemplate >= 3.0.0',
+          'language-tags >= 0.4.3'
       ],
       zip_safe=False)
