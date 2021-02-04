@@ -2,6 +2,15 @@ import pathlib
 import setuptools
 
 
+KEYWORDS = [
+    "knowledge graph",
+    "rdf",
+    "controlled vocabulary",
+    "csv",
+    "tabular data",
+    ]
+
+
 setuptools.setup(
     name="csvwlib",
     version="0.3.2",
@@ -16,9 +25,9 @@ setuptools.setup(
         "Source Code": "https://github.com/DerwenAI/csvwlib",
         },
 
-    author="Derwen, Inc.",
-    author_email="info@derwen.ai",
     license="MIT",
+    author="Aleksander Drozd",
+    author_email="aleksander.drozd@outlook.com",
 
     python_requires=">=3.6",
     packages=[
@@ -38,5 +47,20 @@ setuptools.setup(
         "language-tags >= 0.4.3"
         ],
     zip_safe=False,
-)
 
+    keywords = ", ".join(KEYWORDS),
+    classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Scientific/Engineering :: Human Machine Interfaces",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Text Processing :: Indexing",
+        ],
+)
